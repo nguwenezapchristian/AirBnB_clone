@@ -5,29 +5,24 @@ file_storage module
 import datetime
 import json
 import os
-import sys
-from models.base_model import BaseModel
-from models.user import User
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
-from models.state import State
-from models.city import City
+
 
 class FileStorage:
     """
     FileStorage class for storing, serializing and deserializing data
     """
     __file_path = "file.json"
-
     __objects = {}
-    
 
     def new(self, obj):
         """
-         Sets an object in the __objects dictionary with a key of 
+         Sets an object in the __objects dictionary with a key of
          <obj class name>.id.
+         Import BaseModel locally within the method to avoid circular
+         import at the module level.
         """
+        from models.base_model import BaseModel
+
         obj_cls_name = obj.__class__.__name__
 
         key = "{}.{}".format(obj_cls_name, obj.id)
@@ -59,6 +54,8 @@ class FileStorage:
         """
         This method deserializes the JSON file
         """
+        from models.base_model import BaseModel
+
         if os.path.isfile(FileStorage.__file_path):
             with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
                 try:
@@ -66,12 +63,9 @@ class FileStorage:
 
                     for key, value in obj_dict.items():
                         class_name, obj_id = key.split('.')
-
                         cls = eval(class_name)
 
                         instance = cls(**value)
-
                         FileStorage.__objects[key] = instance
                 except Exception:
                     pass
-
