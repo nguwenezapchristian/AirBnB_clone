@@ -2,9 +2,9 @@
 """
 file_storage module
 """
-import datetime
 import json
 import os
+from models.base_model import BaseModel
 
 
 class FileStorage:
@@ -21,7 +21,7 @@ class FileStorage:
          Import BaseModel locally within the method to avoid circular
          import at the module level.
         """
-        from models.base_model import BaseModel
+        """from models.base_model import BaseModel"""
 
         obj_cls_name = obj.__class__.__name__
 

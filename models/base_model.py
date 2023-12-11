@@ -7,7 +7,7 @@
 
 import uuid
 from datetime import datetime, timezone
-from models import storage
+import models
 
 class BaseModel:
     """
@@ -30,16 +30,20 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self)
+        models.storage.new(self)
 
     def __str__(self):
         """
         should print: [<class name>] (<self.id>) <self.__dict__>
         """
-        return "[{}] ({}) {}".format(
+        attributes = ", ".join(
+                f"'{key}': {repr(getattr(self, key))}"
+                for key in sorted(self.__dict__.keys())
+                )
+        return "[{}] ({}) {{{}}}".format(
                 self.__class__.__name__,
                 self.id,
-                self.__dict__
+                attributes
                 )
 
     def save(self):
@@ -48,7 +52,7 @@ class BaseModel:
         with the current datetime
         """
         self.updated_at = datetime.now()
-        storage.save()
+        models.storage.save()
 
     def to_dict(self):
         """
@@ -57,10 +61,7 @@ class BaseModel:
         """
         obj_dict = self.__dict__.copy()
         obj_dict['__class__'] = self.__class__.__name__
-
-        for key, value in obj_dict.items():
-            """ converting datetime obj to ISO format """
-            if isinstance(value, datetime):
-                obj_dict[key] = value.isoformat()
+        obj_dict['created_at'] = self.created_at.isoformat()
+        obj_dict['updated_at'] = self.updated_at.isoformat()
 
         return obj_dict
