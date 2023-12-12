@@ -1,36 +1,43 @@
 #!/usr/bin/python3
-"""This is the console for AirBnB"""
+"""Console for AirBnB clone"""
 import cmd
 from models import storage
 from datetime import datetime
 from models.base_model import BaseModel
-from models.user import User
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
 from shlex import split
 
 
 class HBNBCommand(cmd.Cmd):
-    """this class is entry point of the command interpreter
-    """
-    prompt = "(hbnb) "
-    all_classes = {"BaseModel", "User", "State", "City",
-                   "Amenity", "Place", "Review"}
-
-    def emptyline(self):
-        """Ignores empty spaces"""
-        pass
-
-    def do_quit(self, line):
-        """Quit command to exit the program"""
-        return True
+    """ defining class for hbnb command interpreter """
+    prompt = '(hbnb) '
 
     def do_EOF(self, line):
-        """Quit command to exit the program at end of file"""
+        """ When (CTRL+D) exit the program """
         return True
+
+    def do_quit(self, line):
+        """ Quit command to exit the program """
+        return True
+
+    def help_quit(self):
+        """ Quit command to exit the program """
+        print("Quit command to exit the program\n")
+
+    def emptyline(self):
+        """ do nothing, give another prompt """
+        pass
+
+    def postloop(self):
+        """
+        print newline when Ctrl+D, to provide a clean
+        separation between the cmd prompt and the shell prompt.
+        """
+        print()
+
+    def default(self, line):
+        """ Print unrecognized command """
+        print(f"Command '{line}' not recognized."
+                "Type 'help' for a list of commands.")
 
     def do_create(self, line):
         """Creates a new instance of BaseModel, saves it
