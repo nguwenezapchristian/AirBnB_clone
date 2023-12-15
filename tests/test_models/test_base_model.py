@@ -22,10 +22,18 @@ class TestBaseModel(unittest.TestCase):
         self.assertIsNotNone(self.inst_model.updated_at)
 
     def test_str(self):
-        """ testing the __str__() method for string repr of instance """
+        """ testing the __str__() method for string repr of instance """ 
         self.assertTrue(str(self.inst_model).startswith('[BaseModel]'))
         self.assertIn(self.inst_model.id, str(self.inst_model))
-        self.assertIn(str(self.inst_model.__dict__), str(self.inst_model))
+        self.assertIn(str(self.inst_model.id), str(self.inst_model))
+        self.assertIn(
+                f"'created_at': {repr(self.inst_model.created_at)}",
+                str(self.inst_model)
+                )
+        self.assertIn(
+                f"'updated_at': {repr(self.inst_model.updated_at)}",
+                str(self.inst_model)
+                )
 
     def test_save(self):
         """ testing save() method which is updating the datetime """
