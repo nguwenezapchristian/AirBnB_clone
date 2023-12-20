@@ -1,53 +1,81 @@
-#!/usr/bin/python3
-"""Console for AirBnB clone"""
+#!/usr/bin/python
+"""
+Module for console
+"""
 import cmd
 import re
+import shlex
 import ast
-from datetime import datetime
-from models.base_model import BaseModel
-from shlex import split
 from models import storage
+from models.base_model import BaseModel
 from models.user import User
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 from models.state import State
 from models.city import City
-from models.place import Place
-from models.amenity import Amenity
-from models.review import Review
+
+
+def split_curly_braces(e_arg):
+    """
+    Splits the curly braces for the update method
+    """
+    curly_braces = re.search(r"\{(.*?)\}", e_arg)
+
+    if curly_braces:
+        id_with_comma = shlex.split(e_arg[:curly_braces.span()[0]])
+        id = [i.strip(",") for i in id_with_comma][0]
+
+        str_data = curly_braces.group(1)
+        try:
+            arg_dict = ast.literal_eval("{" + str_data + "}")
+        except Exception:
+            print("**  invalid dictionary format **")
+            return
+        return id, arg_dict
+    else:
+        commands = e_arg.split(",")
+        if commands:
+            try:
+                id = commands[0]
+            except Exception:
+                return "", ""
+            try:
+                attr_name = commands[1]
+            except Exception:
+                return id, ""
+            try:
+                attr_value = commands[2]
+            except Exception:
+                return id, attr_name
+            return f"{id}", f"{attr_name} {attr_value}"
 
 
 class HBNBCommand(cmd.Cmd):
-    """ defining class for hbnb command interpreter """
+    """
+    HBNBCommand console class
+    """
     prompt = "(hbnb) "
     valid_classes = ["BaseModel", "User", "Amenity",
                      "Place", "Review", "State", "City"]
 
-    def do_EOF(self, line):
-        """ When (CTRL+D) exit the program """
-        return True
-
-    def do_quit(self, line):
-        """ Quit command to exit the program """
-        return True
-
-    def help_quit(self):
-        """ Quit command to exit the program """
-        print("Quit command to exit the program\n")
-
     def emptyline(self):
-        """ do nothing, give another prompt """
+        """
+        Do nothing when an empty line is entered.
+        """
         pass
 
-    def postloop(self):
+    def do_EOF(self, arg):
         """
-        print newline when Ctrl+D, to provide a clean
-        separation between the cmd prompt and the shell prompt.
+        EOF (Ctrl+D) signal to exit the program.
         """
-        print()
+        return True
 
-    def default(self, line):
-        """ Print unrecognized command """
-        print(f"Command '{line}' not recognized."
-                "Type 'help' for a list of commands.")
+    def do_quit(self, arg):
+        """
+        Quit command to exit the program.
+        """
+        return True
 
     def do_create(self, arg):
         """
